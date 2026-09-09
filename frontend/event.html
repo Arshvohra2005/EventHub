@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Event Details | EventHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container nav-container">
+
+        <a href="index.html" class="logo">
+            EventHub
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="registrations.html">
+                My Registrations
+            </a>
+
+            <a href="login.html" class="nav-btn">
+                Login
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<main class="event-detail">
+
+    <div
+        class="container"
+        id="eventContainer"
+    >
+
+        <div class="loading">
+            Loading event...
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <strong>EventHub</strong>
+
+        <p>
+            Discover your next experience.
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script>
+
+const API_URL = "http://localhost:5000/api";
+
+const eventContainer =
+    document.getElementById("eventContainer");
+
+const eventId =
+    new URLSearchParams(window.location.search)
+        .get("id");
+
+
+function escapeHTML(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
+}
+
+
+async function loadEvent() {
+
+    if (!eventId) {
+
+        eventContainer.innerHTML = `
+            <div class="message-box">
+                Event not found.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(`${API_URL}/events/${eventId}`);
+
+        const event =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                event.message || "Event not found."
+            );
+
+        }
+
+
+        const image =
+            event.image ||
+            "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80";
+
+
+        eventContainer.innerHTML = `
+
+            <div class="detail-card">
+
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="${escapeHTML(event.title)}"
+                    class="detail-image"
+                >
+
+                <div class="detail-content">
+
+                    <h1>
+                        ${escapeHTML(event.title)}
+                    </h1>
+
+                    <div class="detail-info">
+
+                        <div>
+                            📅
+                            <strong>Date:</strong>
+                            ${escapeHTML(event.date)}
+                        </div>
+
+                        <div>
+                            🕐
+                            <strong>Time:</strong>
+                            ${escapeHTML(event.time)}
+                        </div>
+
+                        <div>
+                            📍
+                            <strong>Location:</strong>
+                            ${escapeHTML(event.location)}
+                        </div>
+
+                    </div>
+
+
+                    <p class="detail-description">
+                        ${escapeHTML(event.description)}
+                    </p>
+
+
+                    <button
+                        class="primary-btn"
+                        onclick="registerForEvent(${event.id})"
+                    >
+                        Register Now
+                    </button>
+
+                    <a
+                        href="index.html"
+                        class="secondary-btn"
+                        style="margin-left:8px;"
+                    >
+                        Back to Events
+                    </a>
+
+                    <div
+                        id="eventMessage"
+                        class="form-message"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    } catch (error) {
+
+        eventContainer.innerHTML = `
+            <div class="message-box">
+                ${escapeHTML(error.message)}
+            </div>
+        `;
+
+    }
+
+}
+
+
+async function registerForEvent(id) {
+
+    const token =
+        localStorage.getItem("eventhubToken");
+
+    if (!token) {
+
+        window.location.href =
+            `login.html?redirect=event.html?id=${id}`;
+
+        return;
+    }
+
+
+    const message =
+        document.getElementById("eventMessage");
+
+
+    try {
+
+        const response =
+            await fetch(`${API_URL}/registrations`, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    eventId: id
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        message.textContent =
+            data.message || "Registration completed.";
+
+        message.style.color =
+            response.ok ? "#16a34a" : "#dc2626";
+
+
+    } catch (error) {
+
+        message.textContent =
+            "Unable to connect to server.";
+
+        message.style.color =
+            "#dc2626";
+
+    }
+
+}
+
+
+loadEvent();
+
+</script>
+
+</body>
+
+</html>

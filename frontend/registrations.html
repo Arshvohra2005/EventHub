@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Registrations | EventHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container nav-container">
+
+        <a href="index.html" class="logo">
+            EventHub
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="registrations.html">
+                My Registrations
+            </a>
+
+            <a href="#" onclick="logout(); return false;">
+                Logout
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<main class="section">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <h2>My Registrations</h2>
+
+            <p>
+                Events you have registered for.
+            </p>
+
+        </div>
+
+
+        <div
+            id="registrationsContainer"
+            class="events-grid"
+        >
+
+            <div class="loading">
+                Loading registrations...
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <strong>EventHub</strong>
+
+        <p>
+            Your events, all in one place.
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script>
+
+const API_URL = "http://localhost:5000/api";
+
+const container =
+    document.getElementById("registrationsContainer");
+
+
+function escapeHTML(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
+}
+
+
+function logout() {
+
+    localStorage.removeItem("eventhubToken");
+    localStorage.removeItem("currentUser");
+
+    window.location.href = "login.html";
+}
+
+
+async function loadRegistrations() {
+
+    const token =
+        localStorage.getItem("eventhubToken");
+
+    const userString =
+        localStorage.getItem("currentUser");
+
+
+    if (!token || !userString) {
+
+        container.innerHTML = `
+            <div class="message-box">
+                <h3>Please login first.</h3>
+                <br>
+                <a
+                    href="login.html"
+                    class="primary-btn"
+                >
+                    Login
+                </a>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(`${API_URL}/registrations/my`, {
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            if (response.status === 401 ||
+                response.status === 403) {
+
+                logout();
+                return;
+            }
+
+            throw new Error(
+                data.message ||
+                "Unable to load registrations."
+            );
+
+        }
+
+
+        if (data.length === 0) {
+
+            container.innerHTML = `
+                <div class="message-box">
+                    <h3>No registrations yet.</h3>
+
+                    <p>
+                        Explore upcoming events and
+                        register for your first event.
+                    </p>
+
+                    <br>
+
+                    <a
+                        href="index.html#events"
+                        class="primary-btn"
+                    >
+                        Explore Events
+                    </a>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            data.map(registration => {
+
+                const image =
+                    registration.image ||
+                    "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=80";
+
+
+                return `
+
+                    <article class="event-card">
+
+                        <img
+                            src="${escapeHTML(image)}"
+                            alt="${escapeHTML(registration.title)}"
+                            class="event-image"
+                        >
+
+                        <div class="event-body">
+
+                            <h3>
+                                ${escapeHTML(registration.title)}
+                            </h3>
+
+                            <p class="event-description">
+                                ${escapeHTML(
+                                    registration.description
+                                )}
+                            </p>
+
+                            <div class="event-info">
+
+                                <span>
+                                    📅
+                                    ${escapeHTML(
+                                        registration.date
+                                    )}
+                                </span>
+
+                                <span>
+                                    🕐
+                                    ${escapeHTML(
+                                        registration.time
+                                    )}
+                                </span>
+
+                                <span>
+                                    📍
+                                    ${escapeHTML(
+                                        registration.location
+                                    )}
+                                </span>
+
+                                <span>
+                                    ✅ Registered
+                                </span>
+
+                            </div>
+
+                            <a
+                                href="event.html?id=${registration.event_id}"
+                                class="primary-btn full-btn"
+                            >
+                                View Event
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                `;
+
+            }).join("");
+
+
+    } catch (error) {
+
+        container.innerHTML = `
+            <div class="message-box">
+                ${escapeHTML(error.message)}
+            </div>
+        `;
+
+    }
+
+}
+
+
+loadRegistrations();
+
+</script>
+
+</body>
+
+</html>

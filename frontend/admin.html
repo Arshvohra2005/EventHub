@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Dashboard | EventHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container nav-container">
+
+        <a href="index.html" class="logo">
+            EventHub
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                View Website
+            </a>
+
+            <a
+                href="#"
+                onclick="adminLogout(); return false;"
+            >
+                Logout
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <section class="admin-header">
+
+        <h1>Admin Dashboard</h1>
+
+        <p>
+            Manage events and monitor registrations.
+        </p>
+
+    </section>
+
+
+    <!-- STATS -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+
+            <h3>Total Events</h3>
+
+            <div
+                class="stat-number"
+                id="totalEvents"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>Total Users</h3>
+
+            <div
+                class="stat-number"
+                id="totalUsers"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>Total Registrations</h3>
+
+            <div
+                class="stat-number"
+                id="totalRegistrations"
+            >
+                0
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ACTIONS -->
+
+    <section class="admin-actions">
+
+        <button
+            class="primary-btn"
+            onclick="showCreateEventForm()"
+        >
+            + Create Event
+        </button>
+
+        <button
+            class="secondary-btn"
+            onclick="manageEvents()"
+        >
+            Manage Events
+        </button>
+
+        <button
+            class="secondary-btn"
+            onclick="viewRegistrations()"
+        >
+            View Registrations
+        </button>
+
+    </section>
+
+
+    <!-- CONTENT -->
+
+    <section
+        id="adminContent"
+        class="admin-panel"
+    >
+
+        <h2>Admin Panel</h2>
+
+        <p>
+            Select an action above to manage EventHub.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <strong>EventHub Admin</strong>
+
+        <p>
+            Administration Dashboard
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script src="auth.js"></script>
+
+</body>
+
+</html>
