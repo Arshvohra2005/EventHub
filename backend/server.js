@@ -6,9 +6,11 @@ const jwt = require("jsonwebtoken");
 const db = require("./database");
 
 const app = express();
-const PORT = 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
-const JWT_SECRET = "eventhub_secret_key_2026";
+const JWT_SECRET = process.env.JWT_SECRET || "eventhub_secret_key_2026";
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@eventhub.com").trim().toLowerCase();
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
 
 // ======================================================
@@ -213,8 +215,8 @@ app.post("/api/auth/login", async (req, res) => {
 app.post("/api/auth/admin-login", (req, res) => {
     const { email, password } = req.body;
 
-    const adminEmail = "admin@eventhub.com";
-    const adminPassword = "admin123";
+    const adminEmail = ADMIN_EMAIL;
+    const adminPassword = ADMIN_PASSWORD;
 
     if (
         email?.trim().toLowerCase() !== adminEmail ||
@@ -708,6 +710,6 @@ app.get(
 
 app.listen(PORT, () => {
     console.log(
-        `EventHub server running at http://localhost:${PORT}`
+        `EventHub server running on port ${PORT}`
     );
 });

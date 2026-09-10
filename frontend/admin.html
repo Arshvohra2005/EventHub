@@ -29,11 +29,16 @@
         <nav class="nav-links">
 
             <a href="index.html">
-                View Website
+                Home
+            </a>
+
+            <a href="index.html#events">
+                Events
             </a>
 
             <a
                 href="#"
+                class="nav-btn"
                 onclick="adminLogout(); return false;"
             >
                 Logout
@@ -46,109 +51,153 @@
 </header>
 
 
-<main class="container">
+<main class="admin-page">
 
-    <section class="admin-header">
+    <div class="container">
 
-        <h1>Admin Dashboard</h1>
+        <div class="admin-header">
 
-        <p>
-            Manage events and monitor registrations.
-        </p>
+            <div>
 
-    </section>
+                <h1>
+                    Admin Dashboard
+                </h1>
 
+                <p>
+                    Manage events and view registrations.
+                </p>
 
-    <!-- STATS -->
-
-    <section class="stats-grid">
-
-        <div class="stat-card">
-
-            <h3>Total Events</h3>
-
-            <div
-                class="stat-number"
-                id="totalEvents"
-            >
-                0
             </div>
 
         </div>
 
 
-        <div class="stat-card">
+        <!-- ================= STATS ================= -->
 
-            <h3>Total Users</h3>
+        <section class="stats-grid">
 
-            <div
-                class="stat-number"
-                id="totalUsers"
-            >
-                0
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📅
+                </div>
+
+                <div>
+
+                    <h3>
+                        Total Events
+                    </h3>
+
+                    <strong id="totalEvents">
+                        0
+                    </strong>
+
+                </div>
+
             </div>
 
-        </div>
 
+            <div class="stat-card">
 
-        <div class="stat-card">
+                <div class="stat-icon">
+                    👥
+                </div>
 
-            <h3>Total Registrations</h3>
+                <div>
 
-            <div
-                class="stat-number"
-                id="totalRegistrations"
-            >
-                0
+                    <h3>
+                        Total Users
+                    </h3>
+
+                    <strong id="totalUsers">
+                        0
+                    </strong>
+
+                </div>
+
             </div>
 
-        </div>
 
-    </section>
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📝
+                </div>
+
+                <div>
+
+                    <h3>
+                        Registrations
+                    </h3>
+
+                    <strong id="totalRegistrations">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
 
 
-    <!-- ACTIONS -->
+        <!-- ================= ADMIN ACTIONS ================= -->
 
-    <section class="admin-actions">
+        <section class="admin-actions">
 
-        <button
-            class="primary-btn"
-            onclick="showCreateEventForm()"
+            <button
+                type="button"
+                class="primary-btn"
+                onclick="showCreateEventForm()"
+            >
+                + Create Event
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="manageEvents()"
+            >
+                Manage Events
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="viewRegistrations()"
+            >
+                View Registrations
+            </button>
+
+        </section>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <section
+            class="admin-content"
+            id="adminContent"
         >
-            + Create Event
-        </button>
 
-        <button
-            class="secondary-btn"
-            onclick="manageEvents()"
-        >
-            Manage Events
-        </button>
+            <div class="message-box">
 
-        <button
-            class="secondary-btn"
-            onclick="viewRegistrations()"
-        >
-            View Registrations
-        </button>
+                <h2>
+                    Welcome to EventHub Admin
+                </h2>
 
-    </section>
+                <p>
+                    Use the buttons above to create events,
+                    manage existing events, or view user
+                    registrations.
+                </p>
 
+            </div>
 
-    <!-- CONTENT -->
+        </section>
 
-    <section
-        id="adminContent"
-        class="admin-panel"
-    >
-
-        <h2>Admin Panel</h2>
-
-        <p>
-            Select an action above to manage EventHub.
-        </p>
-
-    </section>
+    </div>
 
 </main>
 
@@ -157,10 +206,12 @@
 
     <div class="container footer-content">
 
-        <strong>EventHub Admin</strong>
+        <strong>
+            EventHub
+        </strong>
 
         <p>
-            Administration Dashboard
+            Online Event Discovery & Registration Platform
         </p>
 
     </div>

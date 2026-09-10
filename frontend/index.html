@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -10,124 +13,161 @@
     <title>EventHub | Discover Events</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
+<header class="navbar">
 
-    <header class="navbar">
-        <div class="container nav-container">
+    <div class="container nav-container">
 
-            <a href="index.html" class="logo">
-                EventHub
+        <a href="index.html" class="logo">
+            EventHub
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="index.html">
+                Home
             </a>
 
-            <nav class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="#events">Events</a>
-                <a href="registrations.html">
-                    My Registrations
-                </a>
-                <a href="login.html" class="nav-btn">
-                    Login
-                </a>
-            </nav>
+            <a href="#events">
+                Events
+            </a>
 
-        </div>
-    </header>
+            <a href="registrations.html">
+                My Registrations
+            </a>
 
-
-    <!-- HERO -->
-
-    <section class="hero">
-
-        <div class="container hero-content">
-
-            <h1>
-                Discover.
-                <span>Connect.</span>
-                Experience.
-            </h1>
-
-            <p>
-                Discover exciting upcoming events, explore
-                event details and register for experiences
-                that matter to you.
-            </p>
-
-            <div class="hero-buttons">
-
-                <a
-                    href="#events"
-                    class="primary-btn"
-                    id="exploreEventsBtn"
-                >
-                    Explore Events
-                </a>
-
-                <a
-                    href="signup.html"
-                    class="secondary-btn"
-                >
-                    Create Account
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- EVENTS -->
-
-    <section class="section" id="events">
-
-        <div class="container">
-
-            <div class="section-heading">
-
-                <h2>Upcoming Events</h2>
-
-                <p>
-                    Find your next experience with EventHub.
-                </p>
-
-            </div>
-
-            <div
-                id="eventsContainer"
-                class="events-grid"
+            <a
+                href="login.html"
+                class="nav-btn"
+                id="loginNavBtn"
             >
-                <div class="loading">
-                    Loading events...
-                </div>
-            </div>
+                Login
+            </a>
+
+            <a
+                href="signup.html"
+                class="nav-btn"
+                id="signupNavBtn"
+            >
+                Sign Up
+            </a>
+
+            <a
+                href="#"
+                class="nav-btn"
+                id="logoutNavBtn"
+                onclick="logout(); return false;"
+                style="display: none;"
+            >
+                Logout
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<section class="hero">
+
+    <div class="container hero-content">
+
+        <h1>
+            Discover.
+            <span>Connect.</span>
+            Experience.
+        </h1>
+
+        <p>
+            Discover exciting upcoming events, explore
+            event details and register for experiences
+            that matter to you.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a
+                href="#events"
+                class="primary-btn"
+            >
+                Explore Events
+            </a>
+
+            <a
+                href="signup.html"
+                class="secondary-btn"
+                id="createAccountBtn"
+            >
+                Create Account
+            </a>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- FOOTER -->
+<section
+    class="section"
+    id="events"
+>
 
-    <footer class="footer">
+    <div class="container">
 
-        <div class="container footer-content">
+        <div class="section-heading">
 
-            <strong>EventHub</strong>
+            <h2>
+                Upcoming Events
+            </h2>
 
             <p>
-                Online Event Discovery & Registration Platform
+                Find your next experience with EventHub.
             </p>
 
         </div>
 
-    </footer>
+        <div
+            id="eventsContainer"
+            class="events-grid"
+        >
+
+            <div class="loading">
+                Loading events...
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
 
 
-    <script src="script.js"></script>
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <strong>
+            EventHub
+        </strong>
+
+        <p>
+            Online Event Discovery & Registration Platform
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script src="script.js"></script>
+<script src="auth.js"></script>
 
 </body>
+
 </html>

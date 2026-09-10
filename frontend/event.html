@@ -32,12 +32,38 @@
                 Home
             </a>
 
+            <a href="index.html#events">
+                Events
+            </a>
+
             <a href="registrations.html">
                 My Registrations
             </a>
 
-            <a href="login.html" class="nav-btn">
+            <a
+                href="login.html"
+                class="nav-btn"
+                id="loginNavBtn"
+            >
                 Login
+            </a>
+
+            <a
+                href="signup.html"
+                class="nav-btn"
+                id="signupNavBtn"
+            >
+                Sign Up
+            </a>
+
+            <a
+                href="#"
+                class="nav-btn"
+                id="logoutNavBtn"
+                onclick="handleLogout(); return false;"
+                style="display: none;"
+            >
+                Logout
             </a>
 
         </nav>
@@ -49,13 +75,17 @@
 
 <main class="event-detail">
 
-    <div
-        class="container"
-        id="eventContainer"
-    >
+    <div class="container">
 
-        <div class="loading">
-            Loading event...
+        <div
+            id="eventContainer"
+            class="detail-card"
+        >
+
+            <div class="loading">
+                Loading event...
+            </div>
+
         </div>
 
     </div>
@@ -67,10 +97,12 @@
 
     <div class="container footer-content">
 
-        <strong>EventHub</strong>
+        <strong>
+            EventHub
+        </strong>
 
         <p>
-            Discover your next experience.
+            Online Event Discovery & Registration Platform
         </p>
 
     </div>
@@ -80,34 +112,163 @@
 
 <script>
 
-const API_URL = "http://localhost:5000/api";
+const API_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://eventhub-production.up.railway.app/api";
+
 
 const eventContainer =
-    document.getElementById("eventContainer");
+    document.getElementById(
+        "eventContainer"
+    );
 
-const eventId =
-    new URLSearchParams(window.location.search)
-        .get("id");
 
+// ======================================================
+// ESCAPE HTML
+// ======================================================
 
 function escapeHTML(value) {
 
-    const div = document.createElement("div");
+    const div =
+        document.createElement("div");
 
-    div.textContent = value ?? "";
+    div.textContent =
+        value ?? "";
 
     return div.innerHTML;
+
 }
 
+
+// ======================================================
+// LOGOUT
+// ======================================================
+
+function handleLogout() {
+
+    localStorage.removeItem(
+        "eventhubToken"
+    );
+
+    localStorage.removeItem(
+        "currentUser"
+    );
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+// ======================================================
+// UPDATE NAVBAR
+// ======================================================
+
+function updateNavbar() {
+
+    const token =
+        localStorage.getItem(
+            "eventhubToken"
+        );
+
+    const loginButton =
+        document.getElementById(
+            "loginNavBtn"
+        );
+
+    const signupButton =
+        document.getElementById(
+            "signupNavBtn"
+        );
+
+    const logoutButton =
+        document.getElementById(
+            "logoutNavBtn"
+        );
+
+
+    if (token) {
+
+        if (loginButton) {
+            loginButton.style.display =
+                "none";
+        }
+
+        if (signupButton) {
+            signupButton.style.display =
+                "none";
+        }
+
+        if (logoutButton) {
+            logoutButton.style.display =
+                "inline-block";
+        }
+
+    } else {
+
+        if (loginButton) {
+            loginButton.style.display =
+                "inline-block";
+        }
+
+        if (signupButton) {
+            signupButton.style.display =
+                "inline-block";
+        }
+
+        if (logoutButton) {
+            logoutButton.style.display =
+                "none";
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// GET EVENT ID
+// ======================================================
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const eventId =
+    params.get("id");
+
+
+// ======================================================
+// LOAD EVENT
+// ======================================================
 
 async function loadEvent() {
 
     if (!eventId) {
 
         eventContainer.innerHTML = `
+
             <div class="message-box">
-                Event not found.
+
+                <h3>
+                    Event not found.
+                </h3>
+
+                <br>
+
+                <a
+                    href="index.html#events"
+                    class="primary-btn"
+                >
+                    Back to Events
+                </a>
+
             </div>
+
         `;
 
         return;
@@ -117,7 +278,10 @@ async function loadEvent() {
     try {
 
         const response =
-            await fetch(`${API_URL}/events/${eventId}`);
+            await fetch(
+                `${API_URL}/events/${eventId}`
+            );
+
 
         const event =
             await response.json();
@@ -126,7 +290,8 @@ async function loadEvent() {
         if (!response.ok) {
 
             throw new Error(
-                event.message || "Event not found."
+                event.message ||
+                "Unable to load event."
             );
 
         }
@@ -139,80 +304,95 @@ async function loadEvent() {
 
         eventContainer.innerHTML = `
 
-            <div class="detail-card">
+            <img
+                src="${escapeHTML(image)}"
+                alt="${escapeHTML(event.title)}"
+                class="detail-image"
+            >
 
-                <img
-                    src="${escapeHTML(image)}"
-                    alt="${escapeHTML(event.title)}"
-                    class="detail-image"
-                >
 
-                <div class="detail-content">
+            <div class="detail-content">
 
-                    <h1>
-                        ${escapeHTML(event.title)}
-                    </h1>
+                <h1>
+                    ${escapeHTML(event.title)}
+                </h1>
 
-                    <div class="detail-info">
 
-                        <div>
-                            📅
-                            <strong>Date:</strong>
-                            ${escapeHTML(event.date)}
-                        </div>
+                <p class="detail-description">
+                    ${escapeHTML(event.description)}
+                </p>
 
-                        <div>
-                            🕐
-                            <strong>Time:</strong>
-                            ${escapeHTML(event.time)}
-                        </div>
 
-                        <div>
-                            📍
-                            <strong>Location:</strong>
-                            ${escapeHTML(event.location)}
-                        </div>
+                <div class="detail-info">
 
+                    <div>
+                        📅
+                        <strong>Date:</strong>
+                        ${escapeHTML(event.date)}
                     </div>
 
+                    <div>
+                        🕐
+                        <strong>Time:</strong>
+                        ${escapeHTML(event.time)}
+                    </div>
 
-                    <p class="detail-description">
-                        ${escapeHTML(event.description)}
-                    </p>
-
-
-                    <button
-                        class="primary-btn"
-                        onclick="registerForEvent(${event.id})"
-                    >
-                        Register Now
-                    </button>
-
-                    <a
-                        href="index.html"
-                        class="secondary-btn"
-                        style="margin-left:8px;"
-                    >
-                        Back to Events
-                    </a>
-
-                    <div
-                        id="eventMessage"
-                        class="form-message"
-                    ></div>
+                    <div>
+                        📍
+                        <strong>Location:</strong>
+                        ${escapeHTML(event.location)}
+                    </div>
 
                 </div>
+
+
+                <button
+                    class="primary-btn"
+                    onclick="registerEvent(${event.id})"
+                >
+                    Register for Event
+                </button>
+
+
+                <a
+                    href="index.html#events"
+                    class="secondary-btn"
+                >
+                    Back to Events
+                </a>
 
             </div>
 
         `;
 
+
     } catch (error) {
 
         eventContainer.innerHTML = `
+
             <div class="message-box">
-                ${escapeHTML(error.message)}
+
+                <h3>
+                    Unable to load event
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+                <br>
+
+                <a
+                    href="index.html#events"
+                    class="primary-btn"
+                >
+                    Back to Events
+                </a>
+
             </div>
+
         `;
 
     }
@@ -220,10 +400,17 @@ async function loadEvent() {
 }
 
 
-async function registerForEvent(id) {
+// ======================================================
+// REGISTER EVENT
+// ======================================================
+
+async function registerEvent(id) {
 
     const token =
-        localStorage.getItem("eventhubToken");
+        localStorage.getItem(
+            "eventhubToken"
+        );
+
 
     if (!token) {
 
@@ -234,52 +421,78 @@ async function registerForEvent(id) {
     }
 
 
-    const message =
-        document.getElementById("eventMessage");
-
-
     try {
 
         const response =
-            await fetch(`${API_URL}/registrations`, {
+            await fetch(
+                `${API_URL}/registrations`,
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
+                        "Content-Type":
+                            "application/json",
 
-                body: JSON.stringify({
-                    eventId: id
-                })
+                        "Authorization":
+                            `Bearer ${token}`
 
-            });
+                    },
+
+                    body: JSON.stringify({
+                        eventId: id
+                    })
+
+                }
+            );
 
 
         const data =
             await response.json();
 
 
-        message.textContent =
-            data.message || "Registration completed.";
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
 
-        message.style.color =
-            response.ok ? "#16a34a" : "#dc2626";
+            localStorage.removeItem(
+                "eventhubToken"
+            );
+
+            localStorage.removeItem(
+                "currentUser"
+            );
+
+            window.location.href =
+                `login.html?redirect=event.html?id=${id}`;
+
+            return;
+        }
+
+
+        alert(
+            data.message ||
+            "Registration completed."
+        );
 
 
     } catch (error) {
 
-        message.textContent =
-            "Unable to connect to server.";
-
-        message.style.color =
-            "#dc2626";
+        alert(
+            "Unable to connect to EventHub server."
+        );
 
     }
 
 }
 
+
+// ======================================================
+// INITIALIZE
+// ======================================================
+
+updateNavbar();
 
 loadEvent();
 

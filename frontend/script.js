@@ -1,21 +1,13 @@
-const API_URL = "http://localhost:5000/api";
-
-const eventsContainer =
-    document.getElementById("eventsContainer");
-
-
 // ======================================================
-// ESCAPE HTML
+// EVENTHUB FRONTEND SCRIPT
 // ======================================================
 
-function escapeHTML(value) {
-
-    const div = document.createElement("div");
-
-    div.textContent = value ?? "";
-
-    return div.innerHTML;
-}
+// API URL
+const API_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://eventhub-production.up.railway.app/api";
 
 
 // ======================================================
@@ -24,10 +16,28 @@ function escapeHTML(value) {
 
 async function loadEvents() {
 
+    const container =
+        document.getElementById(
+            "eventsContainer"
+        );
+
+    if (!container) return;
+
+
+    container.innerHTML = `
+        <div class="loading">
+            Loading events...
+        </div>
+    `;
+
+
     try {
 
         const response =
-            await fetch(`${API_URL}/events`);
+            await fetch(
+                `${API_URL}/events`
+            );
+
 
         const events =
             await response.json();
@@ -43,15 +53,20 @@ async function loadEvents() {
         }
 
 
-        if (events.length === 0) {
+        if (!Array.isArray(events) ||
+            events.length === 0) {
 
-            eventsContainer.innerHTML = `
+            container.innerHTML = `
                 <div class="message-box">
-                    <h3>No upcoming events</h3>
+
+                    <h3>
+                        No upcoming events
+                    </h3>
 
                     <p>
                         New events will appear here soon.
                     </p>
+
                 </div>
             `;
 
@@ -59,7 +74,7 @@ async function loadEvents() {
         }
 
 
-        eventsContainer.innerHTML =
+        container.innerHTML =
             events.map(event => {
 
                 const image =
@@ -77,56 +92,55 @@ async function loadEvents() {
                             class="event-image"
                         >
 
-                        <div class="event-body">
+
+                        <div class="event-card-content">
 
                             <h3>
                                 ${escapeHTML(event.title)}
                             </h3>
 
+
                             <p class="event-description">
+
                                 ${escapeHTML(
                                     event.description
                                 )}
+
                             </p>
 
 
-                            <div class="event-info">
+                            <div class="event-meta">
 
                                 <span>
                                     📅
-                                    ${escapeHTML(event.date)}
+                                    ${escapeHTML(
+                                        event.date
+                                    )}
                                 </span>
 
                                 <span>
                                     🕐
-                                    ${escapeHTML(event.time)}
+                                    ${escapeHTML(
+                                        event.time
+                                    )}
                                 </span>
 
                                 <span>
                                     📍
-                                    ${escapeHTML(event.location)}
+                                    ${escapeHTML(
+                                        event.location
+                                    )}
                                 </span>
 
                             </div>
 
 
-                            <div class="event-actions">
-
-                                <a
-                                    href="event.html?id=${event.id}"
-                                    class="secondary-btn"
-                                >
-                                    View Details
-                                </a>
-
-                                <button
-                                    class="primary-btn"
-                                    onclick="registerEvent(${event.id})"
-                                >
-                                    Register
-                                </button>
-
-                            </div>
+                            <a
+                                href="event.html?id=${encodeURIComponent(event.id)}"
+                                class="primary-btn"
+                            >
+                                View Details
+                            </a>
 
                         </div>
 
@@ -139,124 +153,58 @@ async function loadEvents() {
 
     } catch (error) {
 
-        eventsContainer.innerHTML = `
+        console.error(
+            "Events loading error:",
+            error
+        );
+
+
+        container.innerHTML = `
             <div class="message-box">
-                <h3>Unable to load events</h3>
+
+                <h3>
+                    Unable to load events
+                </h3>
 
                 <p>
-                    Make sure the EventHub server is running.
+                    Please make sure the EventHub
+                    server is running.
                 </p>
+
             </div>
         `;
 
-        console.error(error);
-
     }
 
 }
 
 
 // ======================================================
-// REGISTER EVENT
+// ESCAPE HTML
 // ======================================================
 
-async function registerEvent(eventId) {
+function escapeHTML(value) {
 
-    const token =
-        localStorage.getItem("eventhubToken");
+    const div =
+        document.createElement("div");
 
-    if (!token) {
+    div.textContent =
+        value ?? "";
 
-        window.location.href =
-            `login.html?redirect=index.html`;
-
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(`${API_URL}/registrations`, {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-
-                body: JSON.stringify({
-                    eventId
-                })
-
-            });
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            response.status === 401 ||
-            response.status === 403
-        ) {
-
-            localStorage.removeItem("eventhubToken");
-            localStorage.removeItem("currentUser");
-
-            window.location.href = "login.html";
-
-            return;
-        }
-
-
-        alert(data.message);
-
-    } catch (error) {
-
-        alert(
-            "Unable to connect to EventHub server."
-        );
-
-    }
+    return div.innerHTML;
 
 }
 
 
 // ======================================================
-// EXPLORE BUTTON
+// INITIALIZE
 // ======================================================
 
-const exploreButton =
-    document.getElementById("exploreEventsBtn");
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
+        loadEvents();
 
-if (exploreButton) {
-
-    exploreButton.addEventListener(
-        "click",
-        function () {
-
-            const eventsSection =
-                document.getElementById("events");
-
-            if (eventsSection) {
-
-                eventsSection.scrollIntoView({
-                    behavior: "smooth"
-                });
-
-            }
-
-        }
-    );
-
-}
-
-
-// ======================================================
-// INITIAL LOAD
-// ======================================================
-
-loadEvents();
+    }
+);

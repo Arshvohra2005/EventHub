@@ -1,4 +1,17 @@
-const API_URL = "http://localhost:5000/api";
+// ======================================================
+// EVENTHUB AUTHENTICATION & ADMIN FUNCTIONS
+// ======================================================
+
+
+// ======================================================
+// API URL
+// ======================================================
+
+const API_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://eventhub-production.up.railway.app/api";
 
 
 // ======================================================
@@ -7,50 +20,52 @@ const API_URL = "http://localhost:5000/api";
 
 function togglePassword(inputId, button) {
 
-    const input =
-        document.getElementById(inputId);
+    const input = document.getElementById(inputId);
 
     if (!input) return;
-
 
     if (input.type === "password") {
 
         input.type = "text";
-
         button.textContent = "Hide";
 
     } else {
 
         input.type = "password";
-
         button.textContent = "Show";
 
     }
-
 }
 
 
 // ======================================================
-// SAVE LOGIN SESSION
+// SAVE SESSION
 // ======================================================
 
 function saveSession(data) {
 
-    localStorage.setItem(
-        "eventhubToken",
-        data.token
-    );
+    if (data.token) {
 
-    localStorage.setItem(
-        "currentUser",
-        JSON.stringify(data.user)
-    );
+        localStorage.setItem(
+            "eventhubToken",
+            data.token
+        );
 
+    }
+
+    if (data.user) {
+
+        localStorage.setItem(
+            "currentUser",
+            JSON.stringify(data.user)
+        );
+
+    }
 }
 
 
 // ======================================================
-// LOGOUT
+// USER LOGOUT
 // ======================================================
 
 function logout() {
@@ -59,9 +74,12 @@ function logout() {
     localStorage.removeItem("currentUser");
 
     window.location.href = "index.html";
-
 }
 
+
+// ======================================================
+// ADMIN LOGOUT
+// ======================================================
 
 function adminLogout() {
 
@@ -69,12 +87,81 @@ function adminLogout() {
     localStorage.removeItem("currentUser");
 
     window.location.href = "admin-login.html";
+}
+
+
+// ======================================================
+// NAVBAR AUTH STATE
+// ======================================================
+
+function updateNavbar() {
+
+    const token =
+        localStorage.getItem("eventhubToken");
+
+    const currentUser =
+        localStorage.getItem("currentUser");
+
+    const loginButton =
+        document.getElementById("loginNavBtn");
+
+    const signupButton =
+        document.getElementById("signupNavBtn");
+
+    const logoutButton =
+        document.getElementById("logoutNavBtn");
+
+    const createAccountButton =
+        document.getElementById("createAccountBtn");
+
+
+    const loggedIn =
+        Boolean(token && currentUser);
+
+
+    if (loggedIn) {
+
+        if (loginButton) {
+            loginButton.style.display = "none";
+        }
+
+        if (signupButton) {
+            signupButton.style.display = "none";
+        }
+
+        if (createAccountButton) {
+            createAccountButton.style.display = "none";
+        }
+
+        if (logoutButton) {
+            logoutButton.style.display = "inline-block";
+        }
+
+    } else {
+
+        if (loginButton) {
+            loginButton.style.display = "inline-block";
+        }
+
+        if (signupButton) {
+            signupButton.style.display = "inline-block";
+        }
+
+        if (createAccountButton) {
+            createAccountButton.style.display = "inline-block";
+        }
+
+        if (logoutButton) {
+            logoutButton.style.display = "none";
+        }
+
+    }
 
 }
 
 
 // ======================================================
-// USER SIGNUP
+// SIGNUP
 // ======================================================
 
 const signupForm =
@@ -96,24 +183,30 @@ if (signupForm) {
                     .value
                     .trim();
 
+
             const email =
                 document
                     .getElementById("signupEmail")
                     .value
                     .trim();
 
+
             const password =
                 document
                     .getElementById("signupPassword")
                     .value;
+
 
             const confirmPassword =
                 document
                     .getElementById("confirmPassword")
                     .value;
 
+
             const message =
-                document.getElementById("signupMessage");
+                document.getElementById(
+                    "signupMessage"
+                );
 
 
             if (password !== confirmPassword) {
@@ -146,7 +239,6 @@ if (signupForm) {
                     await fetch(
                         `${API_URL}/auth/signup`,
                         {
-
                             method: "POST",
 
                             headers: {
@@ -159,7 +251,6 @@ if (signupForm) {
                                 email,
                                 password
                             })
-
                         }
                     );
 
@@ -181,15 +272,22 @@ if (signupForm) {
                 }
 
 
-               message.textContent =
-    "Account created successfully!";
+                message.textContent =
+                    "Account created successfully!";
 
-message.style.color =
-    "#16a34a";
+                message.style.color =
+                    "#16a34a";
 
-signupForm.reset();
 
-window.location.href = "login.html";
+                signupForm.reset();
+
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "login.html";
+
+                }, 700);
 
 
             } catch (error) {
@@ -231,13 +329,17 @@ if (loginForm) {
                     .value
                     .trim();
 
+
             const password =
                 document
                     .getElementById("loginPassword")
                     .value;
 
+
             const message =
-                document.getElementById("loginMessage");
+                document.getElementById(
+                    "loginMessage"
+                );
 
 
             try {
@@ -246,7 +348,6 @@ if (loginForm) {
                     await fetch(
                         `${API_URL}/auth/login`,
                         {
-
                             method: "POST",
 
                             headers: {
@@ -258,7 +359,6 @@ if (loginForm) {
                                 email,
                                 password
                             })
-
                         }
                     );
 
@@ -295,13 +395,17 @@ if (loginForm) {
                         window.location.search
                     );
 
+
                 const redirect =
                     params.get("redirect");
 
 
                 setTimeout(() => {
 
-                    if (data.user.role === "admin") {
+                    if (
+                        data.user &&
+                        data.user.role === "admin"
+                    ) {
 
                         window.location.href =
                             "admin.html";
@@ -342,7 +446,9 @@ if (loginForm) {
 // ======================================================
 
 const adminLoginForm =
-    document.getElementById("adminLoginForm");
+    document.getElementById(
+        "adminLoginForm"
+    );
 
 
 if (adminLoginForm) {
@@ -360,13 +466,17 @@ if (adminLoginForm) {
                     .value
                     .trim();
 
+
             const password =
                 document
                     .getElementById("adminPassword")
                     .value;
 
+
             const message =
-                document.getElementById("adminMessage");
+                document.getElementById(
+                    "adminMessage"
+                );
 
 
             try {
@@ -375,7 +485,6 @@ if (adminLoginForm) {
                     await fetch(
                         `${API_URL}/auth/admin-login`,
                         {
-
                             method: "POST",
 
                             headers: {
@@ -387,7 +496,6 @@ if (adminLoginForm) {
                                 email,
                                 password
                             })
-
                         }
                     );
 
@@ -448,14 +556,21 @@ if (adminLoginForm) {
 // ======================================================
 
 if (
-    window.location.pathname.endsWith("admin.html")
+    window.location.pathname.endsWith(
+        "admin.html"
+    )
 ) {
 
     const token =
-        localStorage.getItem("eventhubToken");
+        localStorage.getItem(
+            "eventhubToken"
+        );
+
 
     const userString =
-        localStorage.getItem("currentUser");
+        localStorage.getItem(
+            "currentUser"
+        );
 
 
     if (!token || !userString) {
@@ -508,11 +623,19 @@ if (
 function getAuthHeaders() {
 
     const token =
-        localStorage.getItem("eventhubToken");
+        localStorage.getItem(
+            "eventhubToken"
+        );
+
 
     return {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+
+        "Content-Type":
+            "application/json",
+
+        "Authorization":
+            `Bearer ${token}`
+
     };
 
 }
@@ -530,7 +653,8 @@ async function loadAdminStats() {
             await fetch(
                 `${API_URL}/admin/stats`,
                 {
-                    headers: getAuthHeaders()
+                    headers:
+                        getAuthHeaders()
                 }
             );
 
@@ -550,10 +674,16 @@ async function loadAdminStats() {
 
 
         const totalEvents =
-            document.getElementById("totalEvents");
+            document.getElementById(
+                "totalEvents"
+            );
+
 
         const totalUsers =
-            document.getElementById("totalUsers");
+            document.getElementById(
+                "totalUsers"
+            );
+
 
         const totalRegistrations =
             document.getElementById(
@@ -562,18 +692,26 @@ async function loadAdminStats() {
 
 
         if (totalEvents) {
+
             totalEvents.textContent =
                 data.totalEvents;
+
         }
+
 
         if (totalUsers) {
+
             totalUsers.textContent =
                 data.totalUsers;
+
         }
 
+
         if (totalRegistrations) {
+
             totalRegistrations.textContent =
                 data.totalRegistrations;
+
         }
 
 
@@ -596,7 +734,9 @@ async function loadAdminStats() {
 function showCreateEventForm() {
 
     const content =
-        document.getElementById("adminContent");
+        document.getElementById(
+            "adminContent"
+        );
 
 
     if (!content) return;
@@ -610,7 +750,9 @@ function showCreateEventForm() {
 
             <div class="form-group">
 
-                <label>Event Title</label>
+                <label>
+                    Event Title
+                </label>
 
                 <input
                     type="text"
@@ -624,7 +766,9 @@ function showCreateEventForm() {
 
             <div class="form-group">
 
-                <label>Description</label>
+                <label>
+                    Description
+                </label>
 
                 <textarea
                     id="eventDescription"
@@ -637,7 +781,9 @@ function showCreateEventForm() {
 
             <div class="form-group">
 
-                <label>Date</label>
+                <label>
+                    Date
+                </label>
 
                 <input
                     type="date"
@@ -650,7 +796,9 @@ function showCreateEventForm() {
 
             <div class="form-group">
 
-                <label>Time</label>
+                <label>
+                    Time
+                </label>
 
                 <input
                     type="time"
@@ -663,7 +811,9 @@ function showCreateEventForm() {
 
             <div class="form-group">
 
-                <label>Location</label>
+                <label>
+                    Location
+                </label>
 
                 <input
                     type="text"
@@ -677,7 +827,9 @@ function showCreateEventForm() {
 
             <div class="form-group">
 
-                <label>Image URL</label>
+                <label>
+                    Image URL
+                </label>
 
                 <input
                     type="url"
@@ -694,6 +846,7 @@ function showCreateEventForm() {
             >
                 Create Event
             </button>
+
 
             <button
                 type="button"
@@ -788,15 +941,15 @@ async function createEvent(event) {
             await fetch(
                 `${API_URL}/events`,
                 {
-
                     method: "POST",
 
                     headers:
                         getAuthHeaders(),
 
                     body:
-                        JSON.stringify(eventData)
-
+                        JSON.stringify(
+                            eventData
+                        )
                 }
             );
 
@@ -827,7 +980,15 @@ async function createEvent(event) {
 
         event.target.reset();
 
+
         loadAdminStats();
+
+
+        setTimeout(() => {
+
+            manageEvents();
+
+        }, 700);
 
 
     } catch (error) {
@@ -855,11 +1016,17 @@ async function manageEvents() {
         );
 
 
+    if (!content) return;
+
+
     content.innerHTML = `
+
         <h2>Manage Events</h2>
+
         <div class="loading">
             Loading events...
         </div>
+
     `;
 
 
@@ -960,6 +1127,7 @@ async function manageEvents() {
                             Edit
                         </button>
 
+
                         <button
                             class="delete-btn"
                             onclick="deleteEvent(${event.id})"
@@ -977,9 +1145,13 @@ async function manageEvents() {
     } catch (error) {
 
         content.innerHTML = `
+
             <div class="message-box">
+
                 ${escapeHTML(error.message)}
+
             </div>
+
         `;
 
     }
@@ -1029,7 +1201,9 @@ async function editEvent(id) {
 
                 <div class="form-group">
 
-                    <label>Event Title</label>
+                    <label>
+                        Event Title
+                    </label>
 
                     <input
                         type="text"
@@ -1043,7 +1217,9 @@ async function editEvent(id) {
 
                 <div class="form-group">
 
-                    <label>Description</label>
+                    <label>
+                        Description
+                    </label>
 
                     <textarea
                         id="editDescription"
@@ -1055,7 +1231,9 @@ async function editEvent(id) {
 
                 <div class="form-group">
 
-                    <label>Date</label>
+                    <label>
+                        Date
+                    </label>
 
                     <input
                         type="date"
@@ -1069,7 +1247,9 @@ async function editEvent(id) {
 
                 <div class="form-group">
 
-                    <label>Time</label>
+                    <label>
+                        Time
+                    </label>
 
                     <input
                         type="time"
@@ -1083,7 +1263,9 @@ async function editEvent(id) {
 
                 <div class="form-group">
 
-                    <label>Location</label>
+                    <label>
+                        Location
+                    </label>
 
                     <input
                         type="text"
@@ -1097,12 +1279,16 @@ async function editEvent(id) {
 
                 <div class="form-group">
 
-                    <label>Image URL</label>
+                    <label>
+                        Image URL
+                    </label>
 
                     <input
                         type="url"
                         id="editImage"
-                        value="${escapeAttribute(event.image || "")}"
+                        value="${escapeAttribute(
+                            event.image || ""
+                        )}"
                     >
 
                 </div>
@@ -1115,6 +1301,7 @@ async function editEvent(id) {
                     Update Event
                 </button>
 
+
                 <button
                     type="button"
                     class="secondary-btn"
@@ -1122,6 +1309,7 @@ async function editEvent(id) {
                 >
                     Cancel
                 </button>
+
 
                 <div
                     id="editMessage"
@@ -1197,7 +1385,6 @@ async function editEvent(id) {
                             await fetch(
                                 `${API_URL}/events/${id}`,
                                 {
-
                                     method: "PUT",
 
                                     headers:
@@ -1207,7 +1394,6 @@ async function editEvent(id) {
                                         JSON.stringify(
                                             updatedEvent
                                         )
-
                                 }
                             );
 
@@ -1288,12 +1474,10 @@ async function deleteEvent(id) {
             await fetch(
                 `${API_URL}/events/${id}`,
                 {
-
                     method: "DELETE",
 
                     headers:
                         getAuthHeaders()
-
                 }
             );
 
@@ -1334,7 +1518,7 @@ async function deleteEvent(id) {
 
 
 // ======================================================
-// VIEW REGISTRATIONS
+// VIEW ALL REGISTRATIONS
 // ======================================================
 
 async function viewRegistrations() {
@@ -1343,6 +1527,9 @@ async function viewRegistrations() {
         document.getElementById(
             "adminContent"
         );
+
+
+    if (!content) return;
 
 
     content.innerHTML = `
@@ -1415,20 +1602,16 @@ async function viewRegistrations() {
                         <tr>
 
                             <th>User</th>
-
                             <th>Email</th>
-
                             <th>Event</th>
-
                             <th>Date</th>
-
                             <th>Location</th>
-
                             <th>Registered At</th>
 
                         </tr>
 
                     </thead>
+
 
                     <tbody>
 
@@ -1491,7 +1674,9 @@ async function viewRegistrations() {
 
             <div class="message-box">
 
-                ${escapeHTML(error.message)}
+                ${escapeHTML(
+                    error.message
+                )}
 
             </div>
 
@@ -1526,3 +1711,10 @@ function escapeAttribute(value) {
         .replace(/'/g, "&#039;");
 
 }
+
+
+// ======================================================
+// INITIAL AUTH UI
+// ======================================================
+
+updateNavbar();

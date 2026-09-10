@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -11,6 +13,7 @@
     <title>Login | EventHub</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -24,8 +27,23 @@
         </a>
 
         <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="signup.html">Sign Up</a>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="index.html#events">
+                Events
+            </a>
+
+            <a href="signup.html">
+                Sign Up
+            </a>
+
+            <a href="admin-login.html">
+                Admin
+            </a>
+
         </nav>
 
     </div>
@@ -35,89 +53,104 @@
 
 <main class="auth-page">
 
-    <div class="auth-card">
+    <div class="container">
 
-        <h1>Welcome Back</h1>
+        <div class="auth-card">
 
-        <p>
-            Login to your EventHub account.
-        </p>
+            <div class="auth-header">
 
+                <h1>
+                    Welcome Back
+                </h1>
 
-        <form id="loginForm">
-
-            <div class="form-group">
-
-                <label for="loginEmail">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    id="loginEmail"
-                    placeholder="Enter your email"
-                    required
-                >
+                <p>
+                    Login to your EventHub account.
+                </p>
 
             </div>
 
 
-            <div class="form-group">
+            <form id="loginForm">
 
-                <label for="loginPassword">
-                    Password
-                </label>
+                <div class="form-group">
 
-                <div class="password-wrapper">
+                    <label for="loginEmail">
+                        Email
+                    </label>
 
                     <input
-                        type="password"
-                        id="loginPassword"
-                        placeholder="Enter your password"
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Enter your email"
+                        autocomplete="username"
                         required
                     >
 
-                    <button
-                        type="button"
-                        class="password-toggle"
-                        onclick="togglePassword('loginPassword', this)"
-                    >
-                        Show
-                    </button>
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="togglePassword('loginPassword', this)"
+                        >
+                            Show
+                        </button>
+
+                    </div>
 
                 </div>
 
+
+                <button
+                    type="submit"
+                    class="primary-btn auth-submit"
+                >
+                    Login
+                </button>
+
+
+                <div
+                    id="loginMessage"
+                    class="form-message"
+                ></div>
+
+            </form>
+
+
+            <div class="auth-footer">
+
+                <p>
+                    Don't have an account?
+                    <a href="signup.html">
+                        Create Account
+                    </a>
+                </p>
+
+                <p>
+                    Are you an admin?
+                    <a href="admin-login.html">
+                        Admin Login
+                    </a>
+                </p>
+
             </div>
-
-
-            <button
-                type="submit"
-                class="primary-btn full-btn"
-            >
-                Login
-            </button>
-
-            <div
-                id="loginMessage"
-                class="form-message"
-            ></div>
-
-        </form>
-
-
-        <div class="auth-footer">
-
-            Don't have an account?
-
-            <a href="signup.html">
-                Create Account
-            </a>
-
-            <br><br>
-
-            <a href="admin-login.html">
-                Admin Login
-            </a>
 
         </div>
 
@@ -126,7 +159,25 @@
 </main>
 
 
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <strong>
+            EventHub
+        </strong>
+
+        <p>
+            Online Event Discovery & Registration Platform
+        </p>
+
+    </div>
+
+</footer>
+
+
 <script src="auth.js"></script>
 
 </body>
+
 </html>

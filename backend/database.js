@@ -1,44 +1,102 @@
+const path = require("path");
+const fs = require("fs");
 const Database = require("better-sqlite3");
 
-const db = new Database("eventhub.db");
+// ======================================================
+// DATABASE LOCATION
+// ======================================================
 
+// Local development:
+//    EventHub/backend/eventhub.db
+//
+// Railway:
+//    DB_DIR environment variable can point to a persistent Volume,
+//    for example /data
+
+const dbDirectory = process.env.DB_DIR || __dirname;
+
+// Make sure the database directory exists
+if (!fs.existsSync(dbDirectory)) {
+    fs.mkdirSync(dbDirectory, {
+        recursive: true
+    });
+}
+
+const dbPath = path.join(
+    dbDirectory,
+    "eventhub.db"
+);
+
+
+// ======================================================
+// DATABASE CONNECTION
+// ======================================================
+
+const db = new Database(dbPath);
+
+
+// Enable foreign-key support
 db.pragma("foreign_keys = ON");
 
-// ==================== USERS ====================
+
+// ======================================================
+// USERS TABLE
+// ======================================================
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+
         name TEXT NOT NULL,
+
         email TEXT UNIQUE NOT NULL,
+
         password TEXT NOT NULL,
+
         role TEXT NOT NULL DEFAULT 'user',
+
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
 `);
 
-// ==================== EVENTS ====================
+
+// ======================================================
+// EVENTS TABLE
+// ======================================================
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+
         title TEXT NOT NULL,
+
         description TEXT NOT NULL,
+
         date TEXT NOT NULL,
+
         time TEXT NOT NULL,
+
         location TEXT NOT NULL,
+
         image TEXT,
+
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
 `);
 
-// ==================== REGISTRATIONS ====================
+
+// ======================================================
+// REGISTRATIONS TABLE
+// ======================================================
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS registrations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+
         user_id INTEGER NOT NULL,
+
         event_id INTEGER NOT NULL,
+
         registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
         FOREIGN KEY (user_id)
@@ -53,6 +111,18 @@ db.exec(`
     )
 `);
 
-console.log("EventHub database ready!");
+
+// ======================================================
+// DATABASE READY
+// ======================================================
+
+console.log(
+    `EventHub database ready: ${dbPath}`
+);
+
+
+// ======================================================
+// EXPORT DATABASE
+// ======================================================
 
 module.exports = db;

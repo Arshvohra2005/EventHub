@@ -32,11 +32,19 @@
                 Home
             </a>
 
+            <a href="index.html#events">
+                Events
+            </a>
+
             <a href="registrations.html">
                 My Registrations
             </a>
 
-            <a href="#" onclick="logout(); return false;">
+            <a
+                href="#"
+                class="nav-btn"
+                onclick="logout(); return false;"
+            >
                 Logout
             </a>
 
@@ -82,7 +90,9 @@
 
     <div class="container footer-content">
 
-        <strong>EventHub</strong>
+        <strong>
+            EventHub
+        </strong>
 
         <p>
             Your events, all in one place.
@@ -95,53 +105,94 @@
 
 <script>
 
-const API_URL = "http://localhost:5000/api";
+const API_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://localhost:5000/api"
+        : "https://eventhub-production.up.railway.app/api";
+
 
 const container =
-    document.getElementById("registrationsContainer");
+    document.getElementById(
+        "registrationsContainer"
+    );
 
+
+// ======================================================
+// ESCAPE HTML
+// ======================================================
 
 function escapeHTML(value) {
 
-    const div = document.createElement("div");
+    const div =
+        document.createElement("div");
 
-    div.textContent = value ?? "";
+    div.textContent =
+        value ?? "";
 
     return div.innerHTML;
+
 }
 
+
+// ======================================================
+// LOGOUT
+// ======================================================
 
 function logout() {
 
-    localStorage.removeItem("eventhubToken");
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem(
+        "eventhubToken"
+    );
 
-    window.location.href = "login.html";
+    localStorage.removeItem(
+        "currentUser"
+    );
+
+    window.location.href =
+        "index.html";
+
 }
 
+
+// ======================================================
+// LOAD MY REGISTRATIONS
+// ======================================================
 
 async function loadRegistrations() {
 
     const token =
-        localStorage.getItem("eventhubToken");
+        localStorage.getItem(
+            "eventhubToken"
+        );
 
     const userString =
-        localStorage.getItem("currentUser");
+        localStorage.getItem(
+            "currentUser"
+        );
 
 
     if (!token || !userString) {
 
         container.innerHTML = `
+
             <div class="message-box">
-                <h3>Please login first.</h3>
+
+                <h3>
+                    Please login first.
+                </h3>
+
                 <br>
+
                 <a
-                    href="login.html"
+                    href="login.html?redirect=registrations.html"
                     class="primary-btn"
                 >
                     Login
                 </a>
+
             </div>
+
         `;
 
         return;
@@ -151,27 +202,42 @@ async function loadRegistrations() {
     try {
 
         const response =
-            await fetch(`${API_URL}/registrations/my`, {
-
-                headers: {
-                    "Authorization": `Bearer ${token}`
+            await fetch(
+                `${API_URL}/registrations/my`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
                 }
-
-            });
+            );
 
 
         const data =
             await response.json();
 
 
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            localStorage.removeItem(
+                "eventhubToken"
+            );
+
+            localStorage.removeItem(
+                "currentUser"
+            );
+
+            window.location.href =
+                "login.html?redirect=registrations.html";
+
+            return;
+        }
+
+
         if (!response.ok) {
-
-            if (response.status === 401 ||
-                response.status === 403) {
-
-                logout();
-                return;
-            }
 
             throw new Error(
                 data.message ||
@@ -184,8 +250,12 @@ async function loadRegistrations() {
         if (data.length === 0) {
 
             container.innerHTML = `
+
                 <div class="message-box">
-                    <h3>No registrations yet.</h3>
+
+                    <h3>
+                        No registrations yet.
+                    </h3>
 
                     <p>
                         Explore upcoming events and
@@ -200,7 +270,9 @@ async function loadRegistrations() {
                     >
                         Explore Events
                     </a>
+
                 </div>
+
             `;
 
             return;
@@ -221,21 +293,27 @@ async function loadRegistrations() {
 
                         <img
                             src="${escapeHTML(image)}"
-                            alt="${escapeHTML(registration.title)}"
+                            alt="${escapeHTML(
+                                registration.title
+                            )}"
                             class="event-image"
                         >
 
                         <div class="event-body">
 
                             <h3>
-                                ${escapeHTML(registration.title)}
+                                ${escapeHTML(
+                                    registration.title
+                                )}
                             </h3>
+
 
                             <p class="event-description">
                                 ${escapeHTML(
                                     registration.description
                                 )}
                             </p>
+
 
                             <div class="event-info">
 
@@ -266,6 +344,7 @@ async function loadRegistrations() {
 
                             </div>
 
+
                             <a
                                 href="event.html?id=${registration.event_id}"
                                 class="primary-btn full-btn"
@@ -285,15 +364,25 @@ async function loadRegistrations() {
     } catch (error) {
 
         container.innerHTML = `
+
             <div class="message-box">
-                ${escapeHTML(error.message)}
+
+                ${escapeHTML(
+                    error.message
+                )}
+
             </div>
+
         `;
 
     }
 
 }
 
+
+// ======================================================
+// INITIAL LOAD
+// ======================================================
 
 loadRegistrations();
 
